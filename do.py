@@ -1,5 +1,6 @@
 import requests
 from flask import Flask, request
+import chat
 
 app = Flask(__name__)
 
@@ -12,8 +13,12 @@ def post_data():
         QQ_id = request.get_json().get('sender').get('user_id')           # 发送者的QQ号
         Xingxi_text = request.get_json().get('raw_message')               # 发的什么东西
 
+
         # 给go-cqhttp的5700端口提交数据,类似于浏览器访问的形式
-#        requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, Xingxi_text))
+        chat.ai(text=Xingxi_text)
+        rtu = chat.ai()
+
+        requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, rtu))
         print(QQ_name)
         if Xingxi_text == "菜单":
             ap = ("～～【群管系统】～～入群审核      入群欢迎入群改名      自主通知链接检测      名片锁定定时任务      入群验证广告词检测   敏感词检测白名单设置   黑名单设置关键词回复   撤回系统")

@@ -1,18 +1,22 @@
-from flask import Flask, request
 import requests
+from flask import Flask, request
+
 app = Flask(__name__)
 
 @app.route('/', methods=["POST"])
 def post_data():
-    if request.get_json().get('message_type') == 'private':          # 如果是私聊信息
-        QQ_name = request.get_json().get('sender').get('nickname')        # 发送者昵称
-        QQ_id = request.get_json().get('sender').get('user_id')           # 发送者账号
-        Xingxi_text = request.get_json().get('raw_message')               # 信息内容
-        Xingxi_id = request.get_json().get('message_id')                  # 信息ID
-        requests.get("http://127.0.0.1:5700/send_private_msg?user_id=%s&message=%s" % (QQ_id,Xingxi_text) )
+    if request.get_json().get('message_type') == 'group':            # 如果是群聊信息状态码
+        # 获取需要的消息
+        Qun_id = request.get_json().get('group_id')                       # 那个群发的
+        QQ_name = request.get_json().get('sender').get('nickname')        # 发送者人的昵称叫啥
+        QQ_id = request.get_json().get('sender').get('user_id')           # 发送者的QQ号
+        Xingxi_text = request.get_json().get('raw_message')               # 发的什么东西
 
-    return 'OK'
+        # 给go-cqhttp的5700端口提交数据,类似于浏览器访问的形式
+        requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, Xingxi_text))
+        print(QQ_name)
+    return 'OK'  # 对go-cqhttp进行相应，不然会出现三次重试
+
+app.run(debug=True, host='127.0.0.1', port=5701)  #监听本机的5701端口（数据来源于go-cqhttp推送到5701端口的数据）
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5701)  # 此处的 host和 port对应上面 yml文件的设置

@@ -1,6 +1,8 @@
 import requests
 from flask import Flask, request
 import json
+from you_get import common
+
 
 app = Flask(__name__)
 
@@ -14,19 +16,22 @@ def post_data():
         QQ_id = request.get_json().get('sender').get('user_id')  # 发送者的QQ号
         Xingxi_text = request.get_json().get('raw_message')  # 发的什么东西
 
-        # 给go-cqhttp的5700端口提交数据,类似于浏览器访问的形式
-
+        # 给go-cqhttp的5702端口提交数据,类似于浏览器访问的形式
         text = Xingxi_text  # 获取你要说的话
         url = 'http://api.qingyunke.com/api.php?key=free&appid=0&msg=%s' % text  # 这是自动聊天机器人的api接口的网址，然后把最后的参数改为获取到的你说的话
         response = requests.get(url)  # 使用get请求获取响应
         response.encoding = 'utf-8'  # 手动指定字符编码为utf-8
         Text_Json = json.loads(response.text)  # json.loads()是用来读取字符串的
         content = "%s" % Text_Json['content']  # 获取字典content键所指的值
+        requests.get("http://127.0.0.1:5702/send_private_msg?user_id={0}&message={1}".format(1130721292, Xingxi_text))
+        requests.get("http://127.0.0.1:5702/send_private_msg?user_id={0}&message={1}".format(1130721292, Qun_id))
+        requests.get("http://127.0.0.1:5702/send_private_msg?user_id={0}&message={1}".format(1130721292, QQ_name))
+        requests.get("http://127.0.0.1:5702/send_private_msg?user_id={0}&message={1}".format(1130721292, QQ_id))
+        print(Xingxi_text)
 
 
         requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, content))
-        print(QQ_name)
-        print(Xingxi_text)
+
         if Xingxi_text == "菜单":
             ap = (
                 "～～【群管系统】～～入群审核      入群欢迎入群改名      自主通知链接检测      名片锁定定时任务      入群验证广告词检测   敏感词检测白名单设置   黑名单设置关键词回复   撤回系统")

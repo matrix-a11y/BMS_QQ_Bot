@@ -4,7 +4,7 @@ import json
 
 app = Flask(__name__)
 
-
+#核武器函数
 @app.route('/', methods=["POST"])
 def post_data():
     if request.get_json().get('message_type') == 'group':  # 如果是群聊信息状态码
@@ -35,6 +35,6 @@ def post_data():
     return 'OK'  # 对go-cqhttp进行相应，不然会出现三次重试
 
 
-app.run(debug=True, host='127.0.0.1', port=5703)  # 监听本机的5701端口（数据来源于go-cqhttp推送到5701端口的数据）
+app.run(debug=True, host='127.0.0.1', port=5703)  # 监听本机的5703端口（数据来源于go-cqhttp推送到5701端口的数据）
 
 

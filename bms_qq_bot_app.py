@@ -1,8 +1,9 @@
 import requests
 from flask import Flask, request
 import json
-
+import datetime
 app = Flask(__name__)
+time = datetime.datetime.now()
 
 #核武器函数
 @app.route('/', methods=["POST"])
@@ -24,13 +25,16 @@ def post_data():
         content = "%s" % Text_Json['content']  # 获取字典content键所指的值
 
 
+
         requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, content))
-        print(QQ_name)
-        print(Xingxi_text)
         if Xingxi_text == "菜单":
             ap = (
                 "～～【群管系统】～～入群审核      入群欢迎入群改名      自主通知链接检测      名片锁定定时任务      入群验证广告词检测   敏感词检测白名单设置   黑名单设置关键词回复   撤回系统")
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, ap))
+        if Xingxi_text == "当前时间":
+            requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, time))
+
+
 
     return 'OK'  # 对go-cqhttp进行相应，不然会出现三次重试
 

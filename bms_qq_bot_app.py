@@ -2,9 +2,12 @@ import requests
 from flask import Flask, request
 import json
 import datetime
+
+
 app = Flask(__name__)
 
-#核武器函数
+
+# 核武器函数
 @app.route('/', methods=["POST"])
 def post_data():
     if request.get_json().get('message_type') == 'group':  # 如果是群聊信息状态码
@@ -18,7 +21,6 @@ def post_data():
         print(QQ_id)
         print(Xingxi_text)
 
-
         # 给go-cqhttp的5700端口提交数据,类似于浏览器访问的形式
 
         text = Xingxi_text  # 获取你要说的话
@@ -28,21 +30,24 @@ def post_data():
         Text_Json = json.loads(response.text)  # json.loads()是用来读取字符串的
         content = "%s" % Text_Json['content']  # 获取字典content键所指的值
 
-
-
         requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, content))
-        if Xingxi_text == "菜单":
+        if Xingxi_text == "菜单":  # 菜单
             ap = (
                 "～～【群管系统】～～入群审核      入群欢迎入群改名      自主通知链接检测      名片锁定定时任务      入群验证广告词检测   敏感词检测白名单设置   黑名单设置关键词回复   撤回系统")
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, ap))
-        if Xingxi_text == "当前时间":
+        if Xingxi_text == "当前时间":  # 获取时间
             time = datetime.datetime.now()
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, time))
-        if Xingxi_text == "打卡":
+        if Xingxi_text == "打卡":  # 打卡
             requests.get("http://127.0.0.1:5702/send_group_sign?group_id={0}".format(Qun_id))
             Success_out = "Success"
-            requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id,Success_out))
-            print("打卡请求：200",Success_out)
+            requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, Success_out))
+            print("打卡请求：200", Success_out)
+        if Xingxi_text[0:3] == "说句话":
+            tts = Xingxi_text[4:]
+            msg = '[CQ:tts,text=' + tts[:220] + ']'
+            requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, msg))
+
 
 
 
@@ -53,5 +58,3 @@ def post_data():
 
 
 app.run(debug=True, host='127.0.0.1', port=5703)  # 监听本机的5703端口（数据来源于go-cqhttp推送到5701端口的数据）
-
-

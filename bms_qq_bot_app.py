@@ -1,8 +1,10 @@
+import datetime
+import json
+
 import requests
 from flask import Flask, request
-import json
-import datetime
 
+import getvideo
 
 app = Flask(__name__)
 
@@ -47,6 +49,9 @@ def post_data():
             tts = Xingxi_text[4:]
             msg = '[CQ:tts,text=' + tts[:220] + ']'
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, msg))
+        if Xingxi_text[0:23] == "https://www.bilibili.com":
+            path = 'Cachedclips'
+            getvideo.download(Xingxi_text, path)
 
 
 

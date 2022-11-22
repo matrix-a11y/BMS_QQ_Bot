@@ -1,5 +1,7 @@
 import datetime
 import json
+import os
+import random
 
 import requests
 from flask import Flask, request
@@ -51,11 +53,23 @@ def post_data():
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, msg))
         if Xingxi_text[0:23] == "https://www.bilibili.com":
             path = 'Cachedclips'
-            getvideo.download(Xingxi_text, path)
-
-
-
-
+            rcs = "已下载"
+            requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, rcs))
+            file_path = getvideo.download(Xingxi_text, path)
+            file_path = "/".join(os.getcwd().split('\\')) + "/" + file_path
+            name = random.randint(0, 82933902913)
+            name = str(name)
+            requests.get('http://127.0.0.1:5702/upload_group_file?group_id=%s&file=%s&name=%s' % (
+            Qun_id, file_path, name + '.mp4'))
+            getvideo.ok(path)
+        if Xingxi_text[0:16] == "https://music.163.com":
+            path = 'Cachedclips'
+            music_path = getvideo.download(Xingxi_text, path)
+            music_path = "/".join(os.getcwd().split('\\')) + "/" + music_path
+            name = random.randint(1024, 27392837902)
+            name = str(name)
+            requests.get('http://127.0.0.1:5702/upload_group_file?group_id=%s&file=%s&name=%s' % (
+            Qun_id, music_path, name + '.mp3'))
 
 
 

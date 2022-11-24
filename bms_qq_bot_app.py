@@ -51,7 +51,7 @@ def post_data():
             tts = Xingxi_text[4:]
             msg = '[CQ:tts,text=' + tts[:220] + ']'
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, msg))
-        if Xingxi_text[0:23] == "https://www.bilibili.com":
+        if Xingxi_text[0:24] == "https://www.bilibili.com":
             path = 'Cachedclips'
             rcs = "已下载"
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, rcs))
@@ -60,18 +60,29 @@ def post_data():
             name = random.randint(0, 82933902913)
             name = str(name)
             requests.get('http://127.0.0.1:5702/upload_group_file?group_id=%s&file=%s&name=%s' % (
-            Qun_id, file_path, name + '.mp4'))
+                Qun_id, file_path, name + '.mp4'))
             getvideo.ok(path)
-        if Xingxi_text[0:16] == "https://music.163.com":
+        if Xingxi_text[0:22] == "https://music.163.com":
             path = 'Cachedclips'
             music_path = getvideo.download(Xingxi_text, path)
             music_path = "/".join(os.getcwd().split('\\')) + "/" + music_path
             name = random.randint(1024, 27392837902)
             name = str(name)
             requests.get('http://127.0.0.1:5702/upload_group_file?group_id=%s&file=%s&name=%s' % (
-            Qun_id, music_path, name + '.mp3'))
-
-
+                Qun_id, music_path, name + '.mp4'))
+            getvideo.ok(path)
+        if Xingxi_text == "文件统计":
+            requests.get('http://127.0.0.1:5702/get_group_file_system_info?group_id=%s' % (Qun_id))
+            file_count = request.get_json().get('file_count')  # 群里有多少文件
+            limit_count = request.get_json().get('limit_count')  # 能传多少
+            used_space = request.get_json().get('used_space')  # 用了多少空间
+            total_space = request.get_json().get('total_space')  # 总共多少空间
+            file_count = str(file_count)
+            limit_count = str(limit_count)
+            used_space = str(used_space)
+            total_space = str(total_space)
+            send_ap = "文件数量：" + file_count + "\n" + "数量上线：" + limit_count + "\n" + "已用空间：" + used_space + "\n" + "总空间：" + total_space
+            requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, send_ap))
 
     return 'OK'  # 对go-cqhttp进行相应，不然会出现三次重试
 

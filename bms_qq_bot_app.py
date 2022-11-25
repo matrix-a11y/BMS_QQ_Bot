@@ -20,6 +20,8 @@ def post_data():
         QQ_name = request.get_json().get('sender').get('nickname')  # 发送者人的昵称叫啥
         QQ_id = request.get_json().get('sender').get('user_id')  # 发送者的QQ号
         Xingxi_text = request.get_json().get('raw_message')  # 发的什么东西
+        xingxi_id = request.get_json().get('message_id')
+
         print(Qun_id)
         print(QQ_name)
         print(QQ_id)
@@ -83,6 +85,29 @@ def post_data():
             total_space = str(total_space)
             send_ap = "文件数量：" + file_count + "\n" + "数量上线：" + limit_count + "\n" + "已用空间：" + used_space + "\n" + "总空间：" + total_space
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, send_ap))
+        # 检索敏感词并描红输出
+        # 输入
+        word = Xingxi_text
+        # 敏感词库，自己添加词库
+        sensitive = ['第一', '国家级', '最高级', '最佳', '独一无二', '一流', '仅此一次', '顶级',
+                     '顶尖', '尖端', '极品', '极佳', '绝佳', '绝对', '终极', '极致', '首个', '首选',
+                     '独家', '首发', '首次']
+        # 在输入语句中发现的敏感词，放在列表中
+        sensitive_find = []
+        # newword用于标红敏感词，word用于循环
+        newword = word
+        # 遍历敏感词库
+        for item in sensitive:
+            # 将至少出现一次的敏感词放到sensitive_find中，然后标红
+            if word.count(item) > 0:
+                sensitive_find.append(item + ':' + str(word.count(item)) + '次')
+                requests.get("http://127.0.0.1:5702/delete_msg?message_id={0}".format(xingxi_id))
+                # newword存放标红后的整段话，word则不变
+                newword = newword.replace(item, ' \033[1;31m' + item + '\033[0m')
+        print('发现敏感词如下：')
+        for item in sensitive_find:
+            print(item)
+        print('敏感词位置已用星号进行标注：\n' + newword)
 
     return 'OK'  # 对go-cqhttp进行相应，不然会出现三次重试
 

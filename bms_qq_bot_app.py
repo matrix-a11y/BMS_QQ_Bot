@@ -110,8 +110,7 @@ def post_data():
             print(item)
         print('敏感词位置已用星号进行标注：\n' + newword)
         if Xingxi_text[0:6] == "添加违禁词":
-            add = Xingxi_text[7:20]
-            sensitive.append(add)
+            sensitive.append(Xingxi_text[7:20])
             sus_out = "添加成功"
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, sus_out))
 

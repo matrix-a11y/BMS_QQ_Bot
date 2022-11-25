@@ -91,7 +91,7 @@ def post_data():
         # 敏感词库，自己添加词库
         sensitive = ['第一', '国家级', '最高级', '最佳', '独一无二', '一流', '仅此一次', '顶级',
                      '顶尖', '尖端', '极品', '极佳', '绝佳', '绝对', '终极', '极致', '首个', '首选',
-                     '独家', '首发', '首次', 'QQ', 'qq', '加群', '你妈', '你爸', '你爷', '傻逼', '人工智障', '射射',
+                     '独家', '首发', '首次', 'QQ', '加群', '你妈', '你爸', '你爷', '傻逼', '人工智障', '射射',
                      '比特币', '要的联系']
         # 在输入语句中发现的敏感词，放在列表中
         sensitive_find = []
@@ -102,9 +102,10 @@ def post_data():
             # 将至少出现一次的敏感词放到sensitive_find中，然后标红
             if word.count(item) > 0:
                 sensitive_find.append(item + ':' + str(word.count(item)) + '次')
-                requests.get("http://127.0.0.1:5702/delete_msg?message_id={0}".format(xingxi_id))
+
                 # newword存放标红后的整段话，word则不变
                 newword = newword.replace(item, ' \033[1;31m' + item + '\033[0m')
+                requests.get("http://127.0.0.1:5702/delete_msg?message_id={0}".format(xingxi_id))
         print('发现敏感词如下：')
         for item in sensitive_find:
             print(item)

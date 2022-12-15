@@ -1,7 +1,8 @@
 import datetime
-import json
 import os
 import random
+
+import openai
 import requests
 from flask import Flask, request
 
@@ -28,18 +29,29 @@ def post_data():
 
         # 给go-cqhttp的5700端口提交数据,类似于浏览器访问的形式
 
-        text = Xingxi_text  # 获取你要说的话
-        url = 'http://api.qingyunke.com/api.php?key=free&appid=0&msg=%s' % text  # 这是自动聊天机器人的api接口的网址，然后把最后的参数改为获取到的你说的话
-        response = requests.get(url)  # 使用get请求获取响应
-        response.encoding = 'utf-8'  # 手动指定字符编码为utf-8
-        Text_Json = json.loads(response.text)  # json.loads()是用来读取字符串的
-        content = "%s" % Text_Json['content']  # 获取字典content键所指的值
+        #        text = Xingxi_text  # 获取你要说的话
+        #        url = 'http://api.qingyunke.com/api.php?key=free&appid=0&msg=%s' % text  # 这是自动聊天机器人的api接口的网址，然后把最后的参数改为获取到的你说的话
+        #       response = requests.get(url)  # 使用get请求获取响应
+        #        response.encoding = 'utf-8'  # 手动指定字符编码为utf-8
+        #        Text_Json = json.loads(response.text)  # json.loads()是用来读取字符串的
+        #        content = "%s" % Text_Json['content']  # 获取字典content键所指的值
+        # Set the API key for the openai module
+        openai.api_key = "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"  # 这里放入你的key，我这里隐藏了
 
-        requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, content))
-        if Xingxi_text == "菜单":  # 菜单
-            ap = (
-                "～～【群管系统】～～入群审核      入群欢迎入群改名      自主通知链接检测      名片锁定定时任务      入群验证广告词检测   敏感词检测白名单设置   黑名单设置关键词回复   撤回系统")
-            requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, ap))
+        # Use the GPT-3 model to generate text
+        ChatInput = Xingxi_text
+        response = openai.Completion.create(
+            engine="text-davinci-002",
+            prompt=ChatInput,
+            max_tokens=1024,
+            n=1,
+            temperature=0.5,
+        )
+
+        requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id,
+                                                                                            response["choices"][0][
+                                                                                                "text"]))
+
         if Xingxi_text == "当前时间":  # 获取时间
             time = datetime.datetime.now()
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, time))
@@ -90,7 +102,7 @@ def post_data():
         # 敏感词库，自己添加词库
         sensitive = ['QQ', '加群', '你妈',
                      '你爸', '你爷', '傻逼', '人工智障', '射射',
-                     '比特币', '要的联系']
+                     '比特币', '要的联系', ]
         # 在输入语句中发现的敏感词，放在列表中
         sensitive_find = []
         # newword用于标红敏感词，word用于循环
@@ -103,6 +115,7 @@ def post_data():
 
                 # newword存放标红后的整段话，word则不变
                 newword = newword.replace(item, ' \033[1;31m' + item + '\033[0m')
+                # 撤回含有敏感词的消息
                 requests.get("http://127.0.0.1:5702/delete_msg?message_id={0}".format(xingxi_id))
         print('发现敏感词如下：')
         for item in sensitive_find:

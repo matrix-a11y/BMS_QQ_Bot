@@ -2,7 +2,6 @@ import datetime
 import os
 import random
 
-import openai
 import requests
 from flask import Flask, request
 
@@ -36,21 +35,21 @@ def post_data():
         #        Text_Json = json.loads(response.text)  # json.loads()是用来读取字符串的
         #        content = "%s" % Text_Json['content']  # 获取字典content键所指的值
         # Set the API key for the openai module
-        openai.api_key = "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"  # 这里放入你的key，我这里隐藏了
+        # openai.api_key = "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"  # 这里放入你的key，我这里隐藏了
 
         # Use the GPT-3 model to generate text
-        ChatInput = Xingxi_text
-        response = openai.Completion.create(
-            engine="text-davinci-002",
-            prompt=ChatInput,
-            max_tokens=1024,
-            n=1,
-            temperature=0.5,
-        )
+        # ChatInput = Xingxi_text
+        # response = openai.Completion.create(
+        #    engine="text-davinci-002",
+        #    prompt=ChatInput,
+        #    max_tokens=1024,
+        #    n=1,
+        #    temperature=0.5,
+        # )
 
-        requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id,
-                                                                                            response["choices"][0][
-                                                                                                "text"]))
+        # requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id,
+        #                                                                                   response["choices"][0][
+        #                                                                                       "text"]))
 
         if Xingxi_text == "当前时间":  # 获取时间
             time = datetime.datetime.now()

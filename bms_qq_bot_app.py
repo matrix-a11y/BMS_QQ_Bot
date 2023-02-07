@@ -2,6 +2,7 @@ import datetime
 import os
 import random
 
+import pymysql
 import requests
 from flask import Flask, request
 
@@ -10,9 +11,11 @@ import getvideo
 app = Flask(__name__)
 
 
+# 测试
+# 还是实时同步的
 # 核武器函数
 @app.route('/', methods=["POST"])
-def post_data():
+def post_data(DBHOST=None, DBPASS=None):
     if request.get_json().get('message_type') == 'group':  # 如果是群聊信息状态码
         # 获取需要的消息
         Qun_id = request.get_json().get('group_id')  # 那个群发的
@@ -116,14 +119,29 @@ def post_data():
                 newword = newword.replace(item, ' \033[1;31m' + item + '\033[0m')
                 # 撤回含有敏感词的消息
                 requests.get("http://127.0.0.1:5702/delete_msg?message_id={0}".format(xingxi_id))
-        print('发现敏感词如下：')
-        for item in sensitive_find:
-            print(item)
-        print('敏感词位置已用星号进行标注：\n' + newword)
+        # print('发现敏感词如下：')
+
         if Xingxi_text[0:6] == "添加违禁词":
             sensitive.append(Xingxi_text[7:20])
             sus_out = "添加成功"
             requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, sus_out))
+        if Xingxi_text == "连接数据库":
+            try:
+                db = pymysql.connect(host="gz-cynosdbmysql-grp-qwk6hpsv.sql.tencentcdb.com",
+                                     user='root',
+                                     password="",
+                                     database='QQ_Bot',
+                                     charset='utf8',
+                                     port=20795)
+                requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, "连接成功"))
+            except:
+                requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id, "连接失败"))
+
+    if request.get_json().get('message_type') == 'private':  # 如果是私聊信息
+        QQ_name = request.get_json().get('sender').get('nickname')  # 发送者昵称
+        QQ_id_private = request.get_json().get('sender').get('user_id')  # 发送者账号
+        Xingxi_text_private = request.get_json().get('raw_message')  # 信息内容
+        Xingxi_id_private = request.get_json().get('message_id')
 
     return 'OK'  # 对go-cqhttp进行相应，不然会出现三次重试
 

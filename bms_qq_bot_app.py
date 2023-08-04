@@ -156,6 +156,9 @@ def post_data():
                 requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, "成功"))
             except:
                 requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, "失败"))
+        if Xingxi_text == "6":
+            requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, "9"))
+
 
 
 

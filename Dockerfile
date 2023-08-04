@@ -1,0 +1,2 @@
+FROM ubuntu
+EXPOSE 5700 5701

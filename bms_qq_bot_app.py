@@ -16,7 +16,8 @@ database_enable = "false"
 # 核武器函数
 # noinspection SqlResolve
 # 由于tx最近严厉打击协议包
-# 接下来可能会进行重构
+# TODO:接下来可能会进行重构
+# 敬请期待
 
 @app.route('/', methods=["POST"])
 def post_data():

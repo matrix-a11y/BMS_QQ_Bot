@@ -15,6 +15,9 @@ database_enable = "false"
 # 还是实时同步的
 # 核武器函数
 # noinspection SqlResolve
+# 由于tx最近严厉打击协议包
+# 接下来可能会进行重构
+
 @app.route('/', methods=["POST"])
 def post_data():
     if request.get_json().get('message_type') == 'group':  # 如果是群聊信息状态码

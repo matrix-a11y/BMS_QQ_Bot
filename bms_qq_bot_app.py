@@ -2,7 +2,6 @@ import datetime
 import os
 import random
 
-import pymysql
 import requests
 from flask import Flask, request
 
@@ -10,6 +9,7 @@ import getvideo
 
 app = Flask(__name__)
 database_enable = "false"
+
 
 # 测试
 # 还是实时同步的
@@ -34,30 +34,7 @@ def post_data():
         print(QQ_id)
         print(Xingxi_text)
 
-        # 给go-cqhttp的5700端口提交数据,类似于浏览器访问的形式
-
-        #        text = Xingxi_text  # 获取你要说的话
-        #        url = 'http://api.qingyunke.com/api.php?key=free&appid=0&msg=%s' % text  # 这是自动聊天机器人的api接口的网址，然后把最后的参数改为获取到的你说的话
-        #       response = requests.get(url)  # 使用get请求获取响应
-        #        response.encoding = 'utf-8'  # 手动指定字符编码为utf-8
-        #        content = "%s" % Text_Json['content']  # 获取字典content键所指的值
-        #        Text_Json = json.loads(response.text)  # json.loads()是用来读取字符串的
-        # Set the API key for the openai module
-        # openai.api_key = "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"  # 这里放入你的key，我这里隐藏了
-
-        # Use the GPT-3 model to generate text
-        # ChatInput = Xingxi_text
-        # response = openai.Completion.create(
-        #    engine="text-davinci-002",
-        #    prompt=ChatInput,
-        #    max_tokens=1024,
-        #    n=1,
-        #    temperature=0.5,
-        # )
-
-        # requests.get("http://127.0.0.1:5702/send_group_msg?group_id={0}&message={1}".format(Qun_id,
-        #                                                                                   response["choices"][0][
-        #                                                                                       "text"]))
+        # TODO:移除了不需要的部分
 
         if Xingxi_text == "当前时间":  # 获取时间
             time = datetime.datetime.now()
@@ -130,18 +107,7 @@ def post_data():
             sensitive.append(Xingxi_text[7:20])
             sus_out = "添加成功"
             requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, sus_out))
-        if Xingxi_text == "启用数据库":
-            try:
-                db = pymysql.connect(host="gz-cynosdbmysql-grp-qwk6hpsv.sql.tencentcdb.com",
-                                     user='root',
-                                     password="",
-                                     database='QQ_Bot',
-                                     charset='utf8',
-                                     port=20795)
-                requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, "已启用"))
-                database_enable = "true"
-            except:
-                requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, "失败"))
+
         if Xingxi_text == "签到":
             try:
                 MF = random.randint(0, 114514)
@@ -151,22 +117,9 @@ def post_data():
             except:
                 requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id,
                                                                                                     "系统错误，请稍后再试"))
-        if Xingxi_text == "注册":
-            try:
-                cur = db.cursor()
-                sql = """INSERT INTO Group_Member_List(Group_ID, Nickname, QQ_ID) VALUES(Qun_id,QQ_Name,QQ_id)"""
-                cur.execute(sql)
-                db.commit()
-                requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, "成功"))
-            except:
-                requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, "失败"))
+
         if Xingxi_text == "6":
             requests.get("http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}".format(Qun_id, "9"))
-
-
-
-
-
 
     if request.get_json().get('message_type') == 'private':  # 如果是私聊信息
         QQ_name_private = request.get_json().get('sender').get('nickname')  # 发送者昵称
@@ -177,4 +130,4 @@ def post_data():
     return 'OK'  # 对go-cqhttp进行相应，不然会出现三次重试
 
 
-app.run(debug=True, host='127.0.0.1', port=5701)  # 监听本机的5703端口（数据来源于go-cqhttp推送到5701端口的数据）
+app.run(debug=True, host='127.0.0.1', port=5703)  # 监听本机的5703端口（数据来源于go-cqhttp推送到5701端口的数据）
